@@ -1,13 +1,17 @@
 # app.py
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 ###### model loading #####
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-  
-tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-tiny-finetuned-fake-news-detection")
-
-model = AutoModelForSequenceClassification.from_pretrained("mrm8488/bert-tiny-finetuned-fake-news-detection")
+loaded_model = None
+with open('basic_classifier.pkl', 'rb') as fid:
+    loaded_model = pickle.load(fid)
+    
+vectorizer = None
+with open('count_vectorizer.pkl', 'rb') as vd:
+    vectorizer = pickle.load(vd)
 ######################
 
 
@@ -20,14 +24,16 @@ def respond():
     print(f"got name {text}")
 
     response = {}
-    output = model(text)
+    
+    
+    prediction = loaded_model.predict(vectorizer.transform(['This is fake news']))[0]
     
 
-    if not output:
+    if not prediction:
         response["ERROR"] = "no model output"
 
     else:
-        response["MESSAGE"] = f"{output}"
+        response["MESSAGE"] = f"{prediction}"
 
     # Return the response in json format
     return jsonify(response)
