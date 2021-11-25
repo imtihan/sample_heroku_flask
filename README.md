@@ -1,2 +1,2 @@
 # sample_heroku_flask
-# Following: https://stackabuse.com/deploying-a-flask-application-to-heroku/
+# This script was made with guidance from the following tutorial: https://stackabuse.com/deploying-a-flask-application-to-heroku/
