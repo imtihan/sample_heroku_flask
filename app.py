@@ -2,25 +2,32 @@
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
+###### model loading #####
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+  
+tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-tiny-finetuned-fake-news-detection")
+
+model = AutoModelForSequenceClassification.from_pretrained("mrm8488/bert-tiny-finetuned-fake-news-detection")
+######################
+
+
 @app.route('/getmsg/', methods=['GET'])
 def respond():
     # Retrieve the name from url parameter
-    name = request.args.get("name", None)
+    text = request.args.get("text", None)
 
     # For debugging
-    print(f"got name {name}")
+    print(f"got name {text}")
 
     response = {}
+    output = model(text)
+    
 
-    # Check if user sent a name at all
-    if not name:
-        response["ERROR"] = "no name found, please send a name."
-    # Check if the user entered a number not a name
-    elif str(name).isdigit():
-        response["ERROR"] = "name can't be numeric."
-    # Now the user entered a valid name
+    if not output:
+        response["ERROR"] = "no model output"
+
     else:
-        response["MESSAGE"] = f"Welcome {name} to our awesome platform!!"
+        response["MESSAGE"] = f"{output}"
 
     # Return the response in json format
     return jsonify(response)
